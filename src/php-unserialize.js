@@ -1,8 +1,10 @@
 /*!
- * php-unserialize-js
- * @copyright 2013 Bryan Davis and contributors
- * @source https://github.com/bd808/php-unserialize-js
- * @license http://www.opensource.org/licenses/MIT
+ * php-unserialize-js JavaScript Library
+ * https://github.com/bd808/php-unserialize-js
+ *
+ * Copyright 2013 Bryan Davis and contributors
+ * Released under the MIT license
+ * http://www.opensource.org/licenses/MIT
  */
 
 /**
