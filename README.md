@@ -65,5 +65,5 @@ Running the Unit Tests
 [something]: http://phpjs.org/functions/unserialize/
 [OMM]: http://www.oldmanmarkley.com/
 [java implementation]: https://code.google.com/p/serialized-php-parser
-[$wingin' Utter$][]: http://swinginutters.com/
-[jasmine tests][]: spec/php-unserialize_spec.coffee
+[$wingin' Utter$]: http://swinginutters.com/
+[jasmine tests]: spec/php-unserialize_spec.coffee
