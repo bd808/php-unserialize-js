@@ -1,6 +1,3 @@
-require 'jasmine'
-load 'jasmine/tasks/jasmine.rake'
-
 require 'jasmine-headless-webkit'
 Jasmine::Headless::Task.new('jasmine:headless') do |t|
   t.colors = true
@@ -8,5 +5,5 @@ Jasmine::Headless::Task.new('jasmine:headless') do |t|
   t.jasmine_config = 'spec/support/jasmine.yml'
 end
 
-task :test => ['jasmine:headless']
-task :default => [:test]
+task :test => 'jasmine:headless'
+task :default => :test
