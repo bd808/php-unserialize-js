@@ -3,6 +3,8 @@ php-unserialize-js
 
 Convert serialized PHP data to a javascript object graph.
 
+[![Build Status][ci-status]][ci-home]
+
 PHP's serialization format is not well documented, but this function takes
 a best guess approach to parsing and interpreting it. Serialized integers,
 floats, booleans, strings, arrays, objects and references are currently
@@ -24,3 +26,5 @@ Running the Unit Tests
     rake
 
 ---
+[ci-status]: https://secure.travis-ci.org/bd808/php-unserialize-js.png
+[ci-home]: http://travis-ci.org/bd808/php-unserialize-js
