@@ -1,41 +1,46 @@
+/*!
+ * php-unserialize-js
+ * @copyright 2013 Bryan Davis and contributors
+ * @source https://github.com/bd808/php-unserialize-js
+ * @license http://www.opensource.org/licenses/MIT
+ */
+
 /**
  * Parse php serialized data into js objects.
  *
- * @param string input Php serialized string to parse
- * @return mixed Parsed result
- * @author Bryan Davis <bd808@bd808.com>
+ * @param {String} phpstr Php serialized string to parse
+ * @return {mixed} Parsed result
  */
-function php_unserialize (input) {
-  // strings produced by PHP's serialize() function take the general form:
-  //   TYPE(:LENGTH):DATA;
-  // LENGTH is only present for string, array and object data types.
-  var index = 0
+function phpUnserialize (phpstr) {
+  var idx = 0
+    , rstack = []
+    , ridx = 0
 
     , readLength = function () {
-        var del = input.indexOf(':', index)
-          , val = input.substring(index, del);
-        index = del + 2;
+        var del = phpstr.indexOf(':', idx)
+          , val = phpstr.substring(idx, del);
+        idx = del + 2;
         return parseInt(val);
       } //end readLength
 
     , parseAsInt = function () {
-        var del = input.indexOf(';', index)
-          , val = input.substring(index, del);
-        index = del + 1;
+        var del = phpstr.indexOf(';', idx)
+          , val = phpstr.substring(idx, del);
+        idx = del + 1;
         return parseInt(val);
       } //end parseAsInt
 
     , parseAsFloat = function () {
-        var del = input.indexOf(';', index)
-          , val = input.substring(index, del);
-        index = del + 1;
+        var del = phpstr.indexOf(';', idx)
+          , val = phpstr.substring(idx, del);
+        idx = del + 1;
         return parseFloat(val);
       } //end parseAsFloat
 
     , parseAsBoolean = function () {
-        var del = input.indexOf(';', index)
-          , val = input.substring(index, del);
-        index = del + 1;
+        var del = phpstr.indexOf(';', idx)
+          , val = phpstr.substring(idx, del);
+        idx = del + 1;
         return ("1" === val)? true: false;
       } //end parseAsBoolean
 
@@ -46,7 +51,7 @@ function php_unserialize (input) {
           , ch
           , val;
         while (bytes < len) {
-          ch = input.charCodeAt(index + utfLen++);
+          ch = phpstr.charCodeAt(idx + utfLen++);
           if (ch <= 0x007F) {
             bytes++;
           } else if (ch > 0x07FF) {
@@ -55,8 +60,8 @@ function php_unserialize (input) {
             bytes += 2;
           }
         }
-        val = input.substring(index, index + utfLen);
-        index += utfLen + 2;
+        val = phpstr.substring(idx, idx + utfLen);
+        idx += utfLen + 2;
         return val;
       } //end parseAsString
 
@@ -65,48 +70,69 @@ function php_unserialize (input) {
           , resultArray = []
           , resultHash = {}
           , keep = resultArray
+          , lref = ridx++
           , key
           , val;
+
+        rstack[lref] = keep;
         for (var i = 0; i < len; i++) {
           key = parseNext();
           val = parseNext();
-          resultHash[key] = val;
           if (keep === resultArray && parseInt(key) == i) {
+            // store in array version
             resultArray.push(val);
           } else {
-            keep = resultHash;
-          }
-        }
-        index++;
+            if (keep !== resultHash) {
+              // found first non-sequential numeric key
+              // convert existing data to hash
+              for (var j = 0, alen = resultArray.length; j < alen; j++) {
+                resultHash[j] = resultArray[j];
+              }
+              keep = resultHash;
+              rstack[lref] = keep;
+            }
+            resultHash[key] = val;
+          } //end if
+        } //end for
+
+        idx++;
         return keep;
       } //end parseAsArray
 
     , parseAsObject = function () {
         var len = readLength()
           , obj = {}
+          , lref = ridx++
+          , clazzname = phpstr.substring(idx, idx + len)
+          , re_strip = new RegExp("^\u0000(\\*|" + clazzname + ")\u0000")
           , key
-          , val
-          , classname = input.substring(index, index + len)
-          , re_strip = new RegExp("\x0000(\*|" + classname + ")\x0000");
+          , val;
 
-        index += len + 2;
+        rstack[lref] = obj;
+        idx += len + 2;
         len = readLength();
         for (var i = 0; i < len; i++) {
           key = parseNext();
-          // private members start with "\x0000CLASSNAME\x0000"
-          // protected members start with "\x0000*\x0000"
+          // private members start with "\u0000CLASSNAME\u0000"
+          // protected members start with "\u0000*\u0000"
           // we will strip these prefixes
           key = key.replace(re_strip, '');
           val = parseNext();
           obj[key] = val;
         }
-        index++;
+        idx++;
         return obj;
       } //end parseAsObject
 
+    , parseAsRef = function () {
+        var ref = parseAsInt();
+        // php's ref counter is 1-based; our stack is 0-based.
+        return rstack[ref - 1];
+      } //end parseAsRef
+
     , readType = function () {
-        var type = input.charAt(index);
-        index += 2;
+        var type = phpstr.charAt(idx);
+        idx += 2;
         return type;
       } //end readType
 
@@ -119,14 +145,16 @@ function php_unserialize (input) {
           case 's': return parseAsString();
           case 'a': return parseAsArray();
           case 'O': return parseAsObject();
+          case 'r': return parseAsRef();
+          case 'R': return parseAsRef();
           case 'N': return null;
           default:
             throw {
               name: "Parse Error",
-              message: "Unknown type '" + type + "' at postion " + (index - 2)
+              message: "Unknown type '" + type + "' at postion " + (idx - 2)
             }
         } //end switch
     }; //end parseNext
 
     return parseNext();
-} //end php_unserialize
+} //end phpUnserialize
