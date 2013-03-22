@@ -47,8 +47,8 @@ phpUnserialize translates PHP arrays having only 0-based consecutive numeric
 keys into javascript arrays. All other arrays are translated into javascript
 objects.
 
-Members of a PHP object carry scope information via name mangling.
-phpUnserialize strips the scope signifier prefix from private and protected
+Serialized members of a PHP object carry scope information via name mangling.
+`phpUnserialize` strips this scope signifier prefix from private and protected
 members.
 
 Check out the [jasmine tests][] for more details or read the source.
