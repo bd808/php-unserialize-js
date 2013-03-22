@@ -24,7 +24,7 @@ Specifically it doesn't handle references and objects at all. Google found
 a [java implementation][] that looked more complete. I did a quick port of it
 to javascript and moved on to my [$wingin' Utter$][] playlist.
 
-The next day I checked in and found out that strange things we afoot with my
+The next day I checked in and found out that strange things were afoot with my
 port. It turns out that private and protected members `serialize` in an
 "interesting" way. PHP prepends the member name with either the class name
 (private) or an asterisk (protected) surrounded by null bytes (\u0000). The
