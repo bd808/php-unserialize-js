@@ -79,6 +79,19 @@ function phpUnserialize (phpstr) {
         return val;
       } //end parseAsString
 
+    , readKey = function () {
+        var type = readType();
+        switch (type) {
+          case 'i': return readInt();
+          case 's': return readString();
+          default:
+            throw {
+              name: "Parse Error",
+              message: "Unknown key type '" + type + "' at postion " + (idx - 2)
+            }
+        } //end switch
+      }
+
     , parseAsArray = function () {
         var len = readLength()
           , resultArray = []
@@ -90,7 +103,7 @@ function phpUnserialize (phpstr) {
 
         rstack[lref] = keep;
         for (var i = 0; i < len; i++) {
-          key = parseNext();
+          key = readKey();
           val = parseNext();
           if (keep === resultArray && parseInt(key) == i) {
             // store in array version
@@ -169,7 +182,7 @@ function phpUnserialize (phpstr) {
         idx += len + 2;
         len = readLength();
         for (var i = 0; i < len; i++) {
-          key = parseNext();
+          key = readKey();
           // private members start with "\u0000CLASSNAME\u0000"
           //   any class name can be catched for private properties of descendant classes
           // we will replace it with "CLASSNAME::"
