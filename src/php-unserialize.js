@@ -101,12 +101,55 @@ function phpUnserialize (phpstr) {
         return keep;
       } //end parseAsArray
 
+    , fixPropertyName = function (parsedName, baseClassName) {
+        // <NUL>*<NUL>property
+        // <NUL>class<NUL>property
+        if ("\u0000" === parsedName.charAt(0)) {
+          var pos = parsedName.indexOf("\u0000", 1);
+          if (pos > 0) {
+            var class_name = parsedName.substring(1, pos)
+              , prop_name  = parsedName.substr(pos + 1)
+            ;
+            if ("*" === class_name) {
+              // protected
+              return prop_name;
+            }
+            else if (baseClassName === class_name) {
+              // own private
+              return prop_name;
+            }
+            else {
+              // private of a descendant
+              return class_name + "::" + prop_name;
+              /* On the one hand, we need to prefix property name with
+               * class name, because parent and child classes both may
+               * have private property with same name. We don't want
+               * just to overwrite it and lose something.
+               *
+               * On the other hand, property name can be "foo::bar"
+               *
+               *     $obj = new stdClass();
+               *     $obj->{"foo::bar"} = 42;
+               *     // any user-defined class can do this by default
+               *
+               * and such property also can overwrite something.
+               *
+               * So, we can to lose something in any way.
+               */
+            };
+          };
+        }
+        // property
+        else {
+          return parsedName;
+        };
+      }
+
     , parseAsObject = function () {
         var len = readLength()
           , obj = {}
           , lref = ridx++
           , clazzname = phpstr.substring(idx, idx + len)
-          , re_strip = new RegExp("^\u0000(\\*|" + clazzname + ")\u0000")
           , key
           , val;
 
@@ -116,9 +159,11 @@ function phpUnserialize (phpstr) {
         for (var i = 0; i < len; i++) {
           key = parseNext();
           // private members start with "\u0000CLASSNAME\u0000"
+          //   any class name can be catched for private properties of descendant classes
+          // we will replace it with "CLASSNAME::"
           // protected members start with "\u0000*\u0000"
           // we will strip these prefixes
-          key = key.replace(re_strip, '');
+          key = fixPropertyName(key, clazzname);
           val = parseNext();
           obj[key] = val;
         }
