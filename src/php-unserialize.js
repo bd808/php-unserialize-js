@@ -15,6 +15,7 @@
  */
 function phpUnserialize (phpstr) {
   var idx = 0
+    // all values are placed here, but "R", which is PHP's reference
     , rstack = []
     , ridx = 0
 
@@ -34,6 +35,7 @@ function phpUnserialize (phpstr) {
 
     , parseAsInt = function () {
         var val = readInt();
+        rstack[ridx++] = val;
         return val;
       } //end parseAsInt
 
@@ -42,6 +44,7 @@ function phpUnserialize (phpstr) {
           , val = phpstr.substring(idx, del);
         idx = del + 1;
         val = parseFloat(val);
+        rstack[ridx++] = val;
         return val;
       } //end parseAsFloat
 
@@ -50,6 +53,7 @@ function phpUnserialize (phpstr) {
           , val = phpstr.substring(idx, del);
         idx = del + 1;
         val = ("1" === val)? true: false;
+        rstack[ridx++] = val;
         return val;
       } //end parseAsBoolean
 
@@ -76,6 +80,7 @@ function phpUnserialize (phpstr) {
 
     , parseAsString = function () {
         var val = readString();
+        rstack[ridx++] = val;
         return val;
       } //end parseAsString
 
@@ -196,6 +201,14 @@ function phpUnserialize (phpstr) {
         return obj;
       } //end parseAsObject
 
+    , parseAsRefValue = function () {
+        var ref = readInt();
+        // php's ref counter is 1-based; our stack is 0-based.
+        var val = rstack[ref - 1];
+        rstack[ridx++] = val;
+        return val;
+      } //end parseAsRefValue
+
     , parseAsRef = function () {
         var ref = readInt();
         // php's ref counter is 1-based; our stack is 0-based.
@@ -204,6 +217,7 @@ function phpUnserialize (phpstr) {
 
     , parseAsNull = function () {
         var val = null;
+        rstack[ridx++] = val;
         return val;
       } //end parseAsNull
 
@@ -222,8 +236,13 @@ function phpUnserialize (phpstr) {
           case 's': return parseAsString();
           case 'a': return parseAsArray();
           case 'O': return parseAsObject();
-          case 'r': return parseAsRef();
+
+          // link to object, which is a value - affects rstack
+          case 'r': return parseAsRefValue();
+
+          // PHP's referese - DOES NOT affect rstack
           case 'R': return parseAsRef();
+
           case 'N': return parseAsNull();
           default:
             throw {
