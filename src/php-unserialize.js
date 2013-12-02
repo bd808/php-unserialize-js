@@ -176,15 +176,15 @@ function phpUnserialize (phpstr) {
       }
 
     , parseAsObject = function () {
-        var len = readLength()
+        var len
           , obj = {}
           , lref = ridx++
-          , clazzname = phpstr.substring(idx, idx + len)
+          // HACK last char after closing quote is ':', but not ';' as for normal string
+          , clazzname = readString()
           , key
           , val;
 
         rstack[lref] = obj;
-        idx += len + 2;
         len = readLength();
         for (var i = 0; i < len; i++) {
           key = readKey();
