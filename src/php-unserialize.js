@@ -25,28 +25,35 @@ function phpUnserialize (phpstr) {
         return parseInt(val);
       } //end readLength
 
-    , parseAsInt = function () {
+    , readInt = function () {
         var del = phpstr.indexOf(';', idx)
           , val = phpstr.substring(idx, del);
         idx = del + 1;
         return parseInt(val);
+      } //end readInt
+
+    , parseAsInt = function () {
+        var val = readInt();
+        return val;
       } //end parseAsInt
 
     , parseAsFloat = function () {
         var del = phpstr.indexOf(';', idx)
           , val = phpstr.substring(idx, del);
         idx = del + 1;
-        return parseFloat(val);
+        val = parseFloat(val);
+        return val;
       } //end parseAsFloat
 
     , parseAsBoolean = function () {
         var del = phpstr.indexOf(';', idx)
           , val = phpstr.substring(idx, del);
         idx = del + 1;
-        return ("1" === val)? true: false;
+        val = ("1" === val)? true: false;
+        return val;
       } //end parseAsBoolean
 
-    , parseAsString = function () {
+    , readString = function () {
         var len = readLength()
           , utfLen = 0
           , bytes = 0
@@ -64,6 +71,11 @@ function phpUnserialize (phpstr) {
         }
         val = phpstr.substring(idx, idx + utfLen);
         idx += utfLen + 2;
+        return val;
+      } //end readString
+
+    , parseAsString = function () {
+        var val = readString();
         return val;
       } //end parseAsString
 
@@ -172,10 +184,15 @@ function phpUnserialize (phpstr) {
       } //end parseAsObject
 
     , parseAsRef = function () {
-        var ref = parseAsInt();
+        var ref = readInt();
         // php's ref counter is 1-based; our stack is 0-based.
         return rstack[ref - 1];
       } //end parseAsRef
+
+    , parseAsNull = function () {
+        var val = null;
+        return val;
+      } //end parseAsNull
 
     , readType = function () {
         var type = phpstr.charAt(idx);
@@ -194,7 +211,7 @@ function phpUnserialize (phpstr) {
           case 'O': return parseAsObject();
           case 'r': return parseAsRef();
           case 'R': return parseAsRef();
-          case 'N': return null;
+          case 'N': return parseAsNull();
           default:
             throw {
               name: "Parse Error",
