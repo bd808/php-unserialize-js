@@ -23,6 +23,14 @@ $f = new Bar();
 $f->self = $f;
 dump($f);
 
+class Child extends Foo {
+    public $lorem = 42;
+    protected $ipsum = 37;
+    private $dolor = 13;
+}
+$f = new Child();
+dump($f);
+
 $f = new stdClass;
 $f->obj1->obj2->obj3->arr = array();
 $f->obj1->obj2->obj3->arr[] = 1;
