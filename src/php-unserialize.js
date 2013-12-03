@@ -132,47 +132,47 @@ function phpUnserialize (phpstr) {
       } //end parseAsArray
 
     , fixPropertyName = function (parsedName, baseClassName) {
-        // <NUL>*<NUL>property
-        // <NUL>class<NUL>property
+        var class_name
+          , prop_name
+          , pos;
         if ("\u0000" === parsedName.charAt(0)) {
-          var pos = parsedName.indexOf("\u0000", 1);
+          // "<NUL>*<NUL>property"
+          // "<NUL>class<NUL>property"
+          pos = parsedName.indexOf("\u0000", 1);
           if (pos > 0) {
-            var class_name = parsedName.substring(1, pos)
-              , prop_name  = parsedName.substr(pos + 1)
-            ;
+            class_name = parsedName.substring(1, pos);
+            prop_name  = parsedName.substr(pos + 1);
+
             if ("*" === class_name) {
               // protected
               return prop_name;
-            }
-            else if (baseClassName === class_name) {
+            } else if (baseClassName === class_name) {
               // own private
               return prop_name;
-            }
-            else {
+            } else {
               // private of a descendant
               return class_name + "::" + prop_name;
-              /* On the one hand, we need to prefix property name with
-               * class name, because parent and child classes both may
-               * have private property with same name. We don't want
-               * just to overwrite it and lose something.
-               *
-               * On the other hand, property name can be "foo::bar"
-               *
-               *     $obj = new stdClass();
-               *     $obj->{"foo::bar"} = 42;
-               *     // any user-defined class can do this by default
-               *
-               * and such property also can overwrite something.
-               *
-               * So, we can to lose something in any way.
-               */
-            };
-          };
-        }
-        // property
-        else {
+
+              // On the one hand, we need to prefix property name with
+              // class name, because parent and child classes both may
+              // have private property with same name. We don't want
+              // just to overwrite it and lose something.
+              //
+              // On the other hand, property name can be "foo::bar"
+              //
+              //     $obj = new stdClass();
+              //     $obj->{"foo::bar"} = 42;
+              //     // any user-defined class can do this by default
+              //
+              // and such property also can overwrite something.
+              //
+              // So, we can to lose something in any way.
+            }
+          }
+        } else {
+          // public "property"
           return parsedName;
-        };
+        }
       }
 
     , parseAsObject = function () {
