@@ -24,6 +24,10 @@ describe 'Php-serialize Suite', ->
       expect(phpUnserialize('a:2:{s:5:"hello";i:0;s:5:"world";i:1;}')).
         toEqual({'hello':0, 'world':1})
 
+    it "can parse a reference", ->
+      expect(phpUnserialize('a:2:{s:5:"hello";i:42;s:5:"world";R:2;}')).
+        toEqual({'hello':42, 'world':42})
+
   describe 'Object values', ->
     it "can parse an empty object", ->
       expect(phpUnserialize('O:5:"blank":0:{}')).toEqual({})
@@ -63,6 +67,21 @@ describe 'Php-serialize Suite', ->
         "O:3:\"Foo\":4:{s:3:\"bar\";i:1;s:6:\"\u0000*\u0000baz\";i:2;s:10:\"\u0000Foo\u0000xyzzy\";a:9:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;i:7;i:8;i:8;i:9;}s:7:\"\u0000*\u0000self\";r:1;}"
       )).toEqual(expected)
 
+    it "can parse inherited private members", ->
+      expected = {
+        bar : 1,
+        baz : 2,
+        'Foo::xyzzy' : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        lorem : 42,
+        ipsum : 37,
+        dolor : 13,
+      }
+      expected.self = expected
+
+      expect(phpUnserialize(
+        "O:5:\"Child\":7:{s:5:\"lorem\";i:42;s:8:\"\u0000*\u0000ipsum\";i:37;s:12:\"\u0000Child\u0000dolor\";i:13;s:3:\"bar\";i:1;s:6:\"\u0000*\u0000baz\";i:2;s:10:\"\u0000Foo\u0000xyzzy\";a:9:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;i:7;i:8;i:8;i:9;}s:7:\"\u0000*\u0000self\";r:1;}"
+      )).toEqual(expected)
+
     it "can parse an ugly mess", ->
       expected = {
         obj1 : {
@@ -78,4 +97,26 @@ describe 'Php-serialize Suite', ->
 
       expect(phpUnserialize(
         "O:8:\"stdClass\":1:{s:4:\"obj1\";O:8:\"stdClass\":1:{s:4:\"obj2\";O:8:\"stdClass\":1:{s:4:\"obj3\";O:8:\"stdClass\":1:{s:3:\"arr\";a:5:{i:0;i:1;i:1;i:2;i:2;i:3;s:4:\"ref1\";r:3;s:4:\"ref2\";R:5;}}}}}"
+      )).toEqual(expected)
+
+    it "can parse more ugly references", ->
+      expected = {
+        int : 42,
+        str : 'lorem',
+        nul : null,
+        obj : {
+          lorem : 10,
+          ipsum : {},
+        },
+      }
+      expected.obj.ipsumLink = expected.obj.ipsum
+      expected.obj.ipsumRef  = expected.obj.ipsum
+      expected.intRef  = expected.int
+      expected.strRef  = expected.str
+      expected.nulRef  = expected.nul
+      expected.objLink = expected.obj
+      expected.objRef  = expected.obj
+
+      expect(phpUnserialize(
+        "a:9:{s:3:\"int\";i:42;s:3:\"str\";s:5:\"lorem\";s:3:\"nul\";N;s:3:\"obj\";O:8:\"stdClass\":4:{s:5:\"lorem\";i:10;s:5:\"ipsum\";O:8:\"stdClass\":0:{}s:9:\"ipsumLink\";r:7;s:8:\"ipsumRef\";R:7;}s:6:\"intRef\";R:2;s:6:\"strRef\";R:3;s:6:\"nulRef\";R:4;s:7:\"objLink\";r:5;s:6:\"objRef\";R:5;}"
       )).toEqual(expected)
