@@ -14,28 +14,29 @@
  * @return {mixed} Parsed result
  */
 function phpUnserialize (phpstr) {
+  "use strict";
   var idx = 0
-    // all values are placed here, but "R", which is PHP's reference
-    , rstack = []
+    , refStack = []
     , ridx = 0
+    , parseNext // forward declaraton for "use strict"
 
     , readLength = function () {
         var del = phpstr.indexOf(':', idx)
           , val = phpstr.substring(idx, del);
         idx = del + 2;
-        return parseInt(val);
+        return parseInt(val, 10);
       } //end readLength
 
     , readInt = function () {
         var del = phpstr.indexOf(';', idx)
           , val = phpstr.substring(idx, del);
         idx = del + 1;
-        return parseInt(val);
+        return parseInt(val, 10);
       } //end readInt
 
     , parseAsInt = function () {
         var val = readInt();
-        rstack[ridx++] = val;
+        refStack[ridx++] = val;
         return val;
       } //end parseAsInt
 
@@ -44,7 +45,7 @@ function phpUnserialize (phpstr) {
           , val = phpstr.substring(idx, del);
         idx = del + 1;
         val = parseFloat(val);
-        rstack[ridx++] = val;
+        refStack[ridx++] = val;
         return val;
       } //end parseAsFloat
 
@@ -53,7 +54,7 @@ function phpUnserialize (phpstr) {
           , val = phpstr.substring(idx, del);
         idx = del + 1;
         val = ("1" === val)? true: false;
-        rstack[ridx++] = val;
+        refStack[ridx++] = val;
         return val;
       } //end parseAsBoolean
 
@@ -80,9 +81,15 @@ function phpUnserialize (phpstr) {
 
     , parseAsString = function () {
         var val = readString();
-        rstack[ridx++] = val;
+        refStack[ridx++] = val;
         return val;
       } //end parseAsString
+
+    , readType = function () {
+        var type = phpstr.charAt(idx);
+        idx += 2;
+        return type;
+      } //end readType
 
     , readKey = function () {
         var type = readType();
@@ -93,7 +100,7 @@ function phpUnserialize (phpstr) {
             throw {
               name: "Parse Error",
               message: "Unknown key type '" + type + "' at postion " + (idx - 2)
-            }
+            };
         } //end switch
       }
 
@@ -104,24 +111,28 @@ function phpUnserialize (phpstr) {
           , keep = resultArray
           , lref = ridx++
           , key
-          , val;
+          , val
+          , i
+          , j
+          , alen;
 
-        rstack[lref] = keep;
-        for (var i = 0; i < len; i++) {
+        refStack[lref] = keep;
+        for (i = 0; i < len; i++) {
           key = readKey();
           val = parseNext();
-          if (keep === resultArray && parseInt(key) == i) {
+          if (keep === resultArray && parseInt(key, 10) === i) {
             // store in array version
             resultArray.push(val);
+
           } else {
             if (keep !== resultHash) {
               // found first non-sequential numeric key
               // convert existing data to hash
-              for (var j = 0, alen = resultArray.length; j < alen; j++) {
+              for (j = 0, alen = resultArray.length; j < alen; j++) {
                 resultHash[j] = resultArray[j];
               }
               keep = resultHash;
-              rstack[lref] = keep;
+              refStack[lref] = keep;
             }
             resultHash[key] = val;
           } //end if
@@ -179,21 +190,17 @@ function phpUnserialize (phpstr) {
         var len
           , obj = {}
           , lref = ridx++
-          // HACK last char after closing quote is ':', but not ';' as for normal string
+          // HACK last char after closing quote is ':',
+          // but not ';' as for normal string
           , clazzname = readString()
           , key
-          , val;
+          , val
+          , i;
 
-        rstack[lref] = obj;
+        refStack[lref] = obj;
         len = readLength();
-        for (var i = 0; i < len; i++) {
-          key = readKey();
-          // private members start with "\u0000CLASSNAME\u0000"
-          //   any class name can be catched for private properties of descendant classes
-          // we will replace it with "CLASSNAME::"
-          // protected members start with "\u0000*\u0000"
-          // we will strip these prefixes
-          key = fixPropertyName(key, clazzname);
+        for (i = 0; i < len; i++) {
+          key = fixPropertyName(readKey(), clazzname);
           val = parseNext();
           obj[key] = val;
         }
@@ -202,54 +209,48 @@ function phpUnserialize (phpstr) {
       } //end parseAsObject
 
     , parseAsRefValue = function () {
-        var ref = readInt();
-        // php's ref counter is 1-based; our stack is 0-based.
-        var val = rstack[ref - 1];
-        rstack[ridx++] = val;
+        var ref = readInt()
+          // php's ref counter is 1-based; our stack is 0-based.
+          , val = refStack[ref - 1];
+        refStack[ridx++] = val;
         return val;
       } //end parseAsRefValue
 
     , parseAsRef = function () {
         var ref = readInt();
         // php's ref counter is 1-based; our stack is 0-based.
-        return rstack[ref - 1];
+        return refStack[ref - 1];
       } //end parseAsRef
 
     , parseAsNull = function () {
         var val = null;
-        rstack[ridx++] = val;
+        refStack[ridx++] = val;
         return val;
-      } //end parseAsNull
+      }; //end parseAsNull
 
-    , readType = function () {
-        var type = phpstr.charAt(idx);
-        idx += 2;
-        return type;
-      } //end readType
+    parseNext = function () {
+      var type = readType();
+      switch (type) {
+        case 'i': return parseAsInt();
+        case 'd': return parseAsFloat();
+        case 'b': return parseAsBoolean();
+        case 's': return parseAsString();
+        case 'a': return parseAsArray();
+        case 'O': return parseAsObject();
 
-    , parseNext = function () {
-        var type = readType();
-        switch (type) {
-          case 'i': return parseAsInt();
-          case 'd': return parseAsFloat();
-          case 'b': return parseAsBoolean();
-          case 's': return parseAsString();
-          case 'a': return parseAsArray();
-          case 'O': return parseAsObject();
+        // link to object, which is a value - affects refStack
+        case 'r': return parseAsRefValue();
 
-          // link to object, which is a value - affects rstack
-          case 'r': return parseAsRefValue();
+        // PHP's referese - DOES NOT affect refStack
+        case 'R': return parseAsRef();
 
-          // PHP's referese - DOES NOT affect rstack
-          case 'R': return parseAsRef();
-
-          case 'N': return parseAsNull();
-          default:
-            throw {
-              name: "Parse Error",
-              message: "Unknown type '" + type + "' at postion " + (idx - 2)
-            }
-        } //end switch
+        case 'N': return parseAsNull();
+        default:
+          throw {
+            name: "Parse Error",
+            message: "Unknown type '" + type + "' at postion " + (idx - 2)
+          };
+      } //end switch
     }; //end parseNext
 
     return parseNext();
