@@ -16,7 +16,7 @@ something that I can read?" I gaped. He explained that he was trying to slap
 together a js testing harness for a set of REST services that returned
 serialized PHP as their transport representation.
 
-A [google search][] turned up [something][] so went back to listening to the
+A [google search][] turned up [something][] so I went back to listening to the
 latest [OMM][] album. Fifteen minutes later the stream of curses coming from
 Gallilama started harshing my groove. It turns out that the venerable phpjs
 function only handles a particular subset of PHP's `serialize` output.
