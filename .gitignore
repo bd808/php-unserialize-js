@@ -1,4 +1,6 @@
-Gemfile.lock
-.jhw-cache
-.ruby-version
-.rbenv-gemsets
+/.bundle
+/.jhw-cache
+/.rbenv-gemsets
+/.ruby-version
+/Gemfile.lock
+/vendor
