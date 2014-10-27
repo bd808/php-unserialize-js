@@ -241,7 +241,7 @@ function phpUnserialize (phpstr) {
         // link to object, which is a value - affects refStack
         case 'r': return parseAsRefValue();
 
-        // PHP's referese - DOES NOT affect refStack
+        // PHP's reference - DOES NOT affect refStack
         case 'R': return parseAsRef();
 
         case 'N': return parseAsNull();
