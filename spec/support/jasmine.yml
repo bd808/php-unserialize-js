@@ -1,5 +1,5 @@
 src_files:
-    - "src/**/*.{js,coffee}"
+    - "*.{js,coffee}"
 
 helpers:
   - "helpers/**/*.{js,coffee}"

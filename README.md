@@ -1,9 +1,10 @@
-php-unserialize-js
-==================
+phpUnserialize
+==============
 
 Convert serialized PHP data to a javascript object graph.
 
 [![Build Status][ci-status]][ci-home]
+
 
 Why?
 ----
@@ -35,6 +36,7 @@ By this point I was fully committed. Nothing less than a TDD validated library
 that could handle just about any craziness I threw at it would do. I'm sure
 there are still gaps, but this "quick hack" is working for our twisted needs.
 
+
 Implementation Details
 ----------------------
 PHP's serialization format is not well documented, but this function takes
@@ -53,11 +55,41 @@ members.
 
 Check out the [jasmine tests][] for more details or read the source.
 
+
+Usage
+-----
+The `phpUnserialize.js` file implements the [Universal Module Definition][]
+pattern which attempts to be compatible with multiple script loaders including
+[AMD][], [CommonJS][] and direct usage in an HTML file.
+
+Plain HTML:
+```html
+<script src="phpUnserialize.js"></script>
+<script>
+  var foo = phpUnserialize('s:3:"foo";');
+</script>
+```
+
+With an [AMD][] loader:
+```javascript
+define(["phpUnserialize"], function (phpUnserialize) {
+  return {
+    foo: phpUnserialize('s:3:"foo";')
+  };
+});
+```
+
+With a [CommonJS][] loader:
+```javascript
+var foo = require('phpUnserialize')('s:3:"foo";');
+```
+
 Running the Unit Tests
 ----------------------
-    cd php-unserialize-js
-    bundle install
-    rake
+```sh
+bundle install
+rake
+```
 
 ---
 [ci-status]: https://secure.travis-ci.org/bd808/php-unserialize-js.png
@@ -68,3 +100,6 @@ Running the Unit Tests
 [java implementation]: https://code.google.com/p/serialized-php-parser
 [$wingin' Utter$]: http://swinginutters.com/
 [jasmine tests]: spec/php-unserialize_spec.coffee
+[Universal Module Definition]: https://github.com/umdjs/umd
+[AMD]: https://github.com/amdjs/amdjs-api/blob/master/AMD.md
+[CommonJS]: http://wiki.commonjs.org/wiki/CommonJS

@@ -7,7 +7,7 @@
 #   rake jslint paths=path1,path2,... exclude_paths=library1,library2,...
 
 paths:
-  - src/**/*.js
+  - ./*.js
 
 exclude_paths:
 
