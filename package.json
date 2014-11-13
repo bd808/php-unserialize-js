@@ -1,5 +1,5 @@
 {
-  "name": "phpUnserialize",
+  "name": "php-unserialize",
   "description": "Convert serialized PHP data to a javascript object graph",
   "version": "1.0.0",
   "keywords": [ "php", "serialization", "unserialize" ],

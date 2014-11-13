@@ -1,5 +1,5 @@
-phpUnserialize
-==============
+php-unserialize
+===============
 
 Convert serialized PHP data to a javascript object graph.
 
@@ -64,7 +64,7 @@ pattern which attempts to be compatible with multiple script loaders including
 
 Plain HTML:
 ```html
-<script src="phpUnserialize.js"></script>
+<script src="php-unserialize.js"></script>
 <script>
   var foo = phpUnserialize('s:3:"foo";');
 </script>
@@ -72,7 +72,7 @@ Plain HTML:
 
 With an [AMD][] loader:
 ```javascript
-define(["phpUnserialize"], function (phpUnserialize) {
+define(["php-unserialize"], function (phpUnserialize) {
   return {
     foo: phpUnserialize('s:3:"foo";')
   };
@@ -81,7 +81,8 @@ define(["phpUnserialize"], function (phpUnserialize) {
 
 With a [CommonJS][] loader:
 ```javascript
-var foo = require('phpUnserialize')('s:3:"foo";');
+var phpUnserialize = require('php-unserialize');
+var foo = phpUnserialize('s:3:"foo";');
 ```
 
 Running the Unit Tests
