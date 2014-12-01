@@ -1,9 +1,11 @@
+[![Build Status](https://travis-ci.org/bd808/php-unserialize-js.svg?branch=master)](https://travis-ci.org/bd808/php-unserialize-js)
+[![npm
+version](https://badge.fury.io/js/phpunserialize.svg)](http://badge.fury.io/js/phpunserialize)
+
 phpUnserialize
 ==============
 
 Convert serialized PHP data to a javascript object graph.
-
-[![Build Status][ci-status]][ci-home]
 
 
 Why?
@@ -93,8 +95,6 @@ rake
 ```
 
 ---
-[ci-status]: https://secure.travis-ci.org/bd808/php-unserialize-js.png
-[ci-home]: http://travis-ci.org/bd808/php-unserialize-js
 [google search]: https://www.google.com/search?q=php+unserialize+javascript
 [something]: http://phpjs.org/functions/unserialize/
 [OMM]: http://www.oldmanmarkley.com/
