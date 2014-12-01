@@ -117,7 +117,7 @@
             default:
               throw {
                 name: "Parse Error",
-                message: "Unknown key type '" + type + "' at postion " +
+                message: "Unknown key type '" + type + "' at position " +
                     (idx - 2)
               };
           } //end switch
@@ -267,7 +267,7 @@
           default:
             throw {
               name: "Parse Error",
-              message: "Unknown type '" + type + "' at postion " + (idx - 2)
+              message: "Unknown type '" + type + "' at position " + (idx - 2)
             };
         } //end switch
       }; //end parseNext
