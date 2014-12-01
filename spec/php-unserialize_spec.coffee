@@ -120,3 +120,22 @@ describe 'Php-serialize Suite', ->
       expect(phpUnserialize(
         "a:9:{s:3:\"int\";i:42;s:3:\"str\";s:5:\"lorem\";s:3:\"nul\";N;s:3:\"obj\";O:8:\"stdClass\":4:{s:5:\"lorem\";i:10;s:5:\"ipsum\";O:8:\"stdClass\":0:{}s:9:\"ipsumLink\";r:7;s:8:\"ipsumRef\";R:7;}s:6:\"intRef\";R:2;s:6:\"strRef\";R:3;s:6:\"nulRef\";R:4;s:7:\"objLink\";r:5;s:6:\"objRef\";R:5;}"
       )).toEqual(expected)
+
+  describe 'Custom serializers', ->
+    it "can parse a SplDoublyLinkedList", ->
+      expected = {
+        '__PHP_Incomplete_Class_Name': 'SplDoublyLinkedList',
+        'serialized': 'i:0;'
+      }
+      expect(
+        phpUnserialize("C:19:\"SplDoublyLinkedList\":4:{i:0;}")
+      ).toEqual(expected)
+
+    it "can parse a SplObjectStorage", ->
+      expected = {
+        '__PHP_Incomplete_Class_Name': 'SplObjectStorage',
+        'serialized': 'x:i:2;O:8:"stdClass":1:{s:1:"a";O:8:"stdClass":0:{}},i:1;;r:4;,i:2;;m:a:0:{}'
+      }
+      expect(
+        phpUnserialize("C:16:\"SplObjectStorage\":76:{x:i:2;O:8:\"stdClass\":1:{s:1:\"a\";O:8:\"stdClass\":0:{}},i:1;;r:4;,i:2;;m:a:0:{}}")
+      ).toEqual(expected)

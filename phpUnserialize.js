@@ -227,6 +227,15 @@
           return obj;
         } //end parseAsObject
 
+      , parseAsCustom = function () {
+          var clazzname = readString()
+            , content = readString();
+          return {
+            "__PHP_Incomplete_Class_Name": clazzname,
+            "serialized": content
+          };
+        } //end parseAsCustom
+
       , parseAsRefValue = function () {
           var ref = readInt()
             // php's ref counter is 1-based; our stack is 0-based.
@@ -256,6 +265,7 @@
           case 's': return parseAsString();
           case 'a': return parseAsArray();
           case 'O': return parseAsObject();
+          case 'C': return parseAsCustom();
 
           // link to object, which is a value - affects refStack
           case 'r': return parseAsRefValue();

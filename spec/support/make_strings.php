@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 
 function dump ($o) {
   $o = serialize($o);
@@ -56,4 +57,15 @@ $f['strRef']  = &$f['str'];
 $f['nulRef']  = &$f['nul'];
 $f['objLink'] = $f['obj'];
 $f['objRef']  = &$f['obj'];
+dump($f);
+
+$f = new SplDoublyLinkedList();
+dump($f);
+
+$o = new StdClass();
+$a = new StdClass();
+$o->a = $a;
+$f = new SplObjectStorage();
+$f[$o] = 1;
+$f[$a] = 2;
 dump($f);
