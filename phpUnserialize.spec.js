@@ -1,4 +1,4 @@
-const phpUnserialize = require('./phpUnserialize');
+var phpUnserialize = require('./phpUnserialize');
 
 describe('Php-serialize Suite', () => {
   describe('Primative values', () => {
@@ -178,6 +178,42 @@ describe('Php-serialize Suite', () => {
       expect(
         phpUnserialize("C:16:\"SplObjectStorage\":76:{x:i:2;O:8:\"stdClass\":1:{s:1:\"a\";O:8:\"stdClass\":0:{}},i:1;;r:4;,i:2;;m:a:0:{}}")
       ).toEqual(expected);
+    });
+  });
+
+  describe('Invalid input', () => {
+    it('throws exception on unknown type', () => {
+      expect.assertions(2);
+      try {
+        phpUnserialize('');
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty('message', "Unknown type '' at position 0");
+      }
+    });
+    it('throws exception on unknown array key type', () => {
+      expect.assertions(3);
+      try {
+        phpUnserialize('a:1:{d:1.0;s:5:"hello";}');
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty(
+          'message', "Unknown key type 'd' at position 5"
+        );
+        expect(e).toHaveProperty('state', []);
+      }
+    });
+    it('throws exception on unknown object key type', () => {
+      expect.assertions(3);
+      try {
+        phpUnserialize('O:4:"junk":1:{d:1.0;s:5:"hello";}')
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty(
+          'message', "Unknown key type 'd' at position 14"
+        );
+        expect(e).toHaveProperty('state', {});
+      }
     });
   });
 });

@@ -119,11 +119,9 @@
             case 'i': return readInt();
             case 's': return readString();
             default:
-              throw {
-                name: "Parse Error",
-                message: "Unknown key type '" + type + "' at position " +
-                    (idx - 2)
-              };
+              var msg = "Unknown key type '" + type + "' at position " +
+                (idx - 2);
+              throw new Error(msg);
           } //end switch
         }
 
@@ -140,26 +138,32 @@
             , alen;
 
           refStack[lref] = keep;
-          for (i = 0; i < len; i++) {
-            key = readKey();
-            val = parseNext();
-            if (keep === resultArray && key + '' === i + '') {
-              // store in array version
-              resultArray.push(val);
+          try {
+            for (i = 0; i < len; i++) {
+              key = readKey();
+              val = parseNext();
+              if (keep === resultArray && key + '' === i + '') {
+                // store in array version
+                resultArray.push(val);
 
-            } else {
-              if (keep !== resultHash) {
-                // found first non-sequential numeric key
-                // convert existing data to hash
-                for (j = 0, alen = resultArray.length; j < alen; j++) {
-                  resultHash[j] = resultArray[j];
+              } else {
+                if (keep !== resultHash) {
+                  // found first non-sequential numeric key
+                  // convert existing data to hash
+                  for (j = 0, alen = resultArray.length; j < alen; j++) {
+                    resultHash[j] = resultArray[j];
+                  }
+                  keep = resultHash;
+                  refStack[lref] = keep;
                 }
-                keep = resultHash;
-                refStack[lref] = keep;
-              }
-              resultHash[key] = val;
-            } //end if
-          } //end for
+                resultHash[key] = val;
+              } //end if
+            } //end for
+          } catch (e) {
+            // decorate exception with current state
+            e.state = keep;
+            throw e;
+          }
 
           idx++;
           return keep;
@@ -222,10 +226,16 @@
 
           refStack[lref] = obj;
           len = readLength();
-          for (i = 0; i < len; i++) {
-            key = fixPropertyName(readKey(), clazzname);
-            val = parseNext();
-            obj[key] = val;
+          try {
+            for (i = 0; i < len; i++) {
+              key = fixPropertyName(readKey(), clazzname);
+              val = parseNext();
+              obj[key] = val;
+            }
+          } catch (e) {
+            // decorate exception with current state
+            e.state = obj;
+            throw e;
           }
           idx++;
           return obj;
@@ -279,10 +289,8 @@
 
           case 'N': return parseAsNull();
           default:
-            throw {
-              name: "Parse Error",
-              message: "Unknown type '" + type + "' at position " + (idx - 2)
-            };
+            var msg = "Unknown type '" + type + "' at position " + (idx - 2);
+            throw new Error(msg);
         } //end switch
       }; //end parseNext
 
