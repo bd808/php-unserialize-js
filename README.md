@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/bd808/php-unserialize-js.svg?branch=master)](https://travis-ci.org/bd808/php-unserialize-js)
-[![npm
-version](https://badge.fury.io/js/phpunserialize.svg)](http://badge.fury.io/js/phpunserialize)
+[![Build Status](https://img.shields.io/travis/bd808/php-unserialize-js.svg?style=flat)](https://travis-ci.org/bd808/php-unserialize-js)
+[![npm version](https://img.shields.io/npm/v/phpunserialize.svg?style=flat)](https://www.npmjs.com/package/phpunserialize)
+[![Bower](https://img.shields.io/bower/v/phpunserialize.svg?style=flat)]()
 
 phpUnserialize
 ==============
