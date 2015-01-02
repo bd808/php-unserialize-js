@@ -69,3 +69,9 @@ $f = new SplObjectStorage();
 $f[$o] = 1;
 $f[$a] = 2;
 dump($f);
+
+$f = 'blåbærsyltetøy';
+dump($f);
+
+$f = '$¢€𠜎';
+dump($f);

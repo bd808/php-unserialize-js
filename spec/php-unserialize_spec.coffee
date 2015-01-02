@@ -2,6 +2,14 @@ describe 'Php-serialize Suite', ->
   describe 'Primative values', ->
     it "can parse a string", ->
       expect(phpUnserialize('s:3:"foo";')).toBe('foo')
+      expect(phpUnserialize('s:17:"bl\u00e5b\u00e6rsyltet\u00f8y";')).
+        toBe('blåbærsyltetøy')
+      expect(phpUnserialize('s:17:"blåbærsyltetøy";')).
+        toBe('blåbærsyltetøy')
+      expect(phpUnserialize('s:10:"$\u00a2\u20ac\ud841\udf0e";'))
+        .toBe('$¢€𠜎')
+      expect(phpUnserialize('s:10:"$¢€𠜎";'))
+        .toBe('$¢€𠜎')
 
     it "can parse an integer", ->
       expect(phpUnserialize('i:1337;')).toBe(1337)
