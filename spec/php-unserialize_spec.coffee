@@ -147,3 +147,14 @@ describe 'Php-serialize Suite', ->
       expect(
         phpUnserialize("C:16:\"SplObjectStorage\":76:{x:i:2;O:8:\"stdClass\":1:{s:1:\"a\";O:8:\"stdClass\":0:{}},i:1;;r:4;,i:2;;m:a:0:{}}")
       ).toEqual(expected)
+
+  describe 'Invalid input', ->
+    it "throws exceptions on failure", ->
+      expect(-> phpUnserialize('')).toThrow({
+        name: "Parse Error",
+        message: "Unknown type '' at position 0"
+      })
+      expect(-> phpUnserialize('a:13:{s:2:"en";s:21:"Are you a vegetarian?";s:2:"de";s:19:"Bist Du Vegetarier?";s:2:"jp";s:30:"ãƒ™ã‚¸ã‚¿ãƒªã‚¢ãƒ³ã§ã™ã‹ï¼Ÿ";s:2:"fi";s:19:"Oletko kasvissyöjä?";s:2:"pl";s:26:"Czy jeste¶ wegetarianinem?";s:2:"es";s:20:"¿Eres Vegetariano/a?";s:2:"fr";s:16:"Es-tu végétarien";s:7:"en_utf8";s:21:"Are you a vegetarian?";s:7:"es_utf8";s:21:"Â¿Eres Vegetariano/a?";s:7:"de_utf8";s:19:"Bist Du Vegetarier?";s:7:"fi_utf8";s:21:"Oletko kasvissyÃ¶jÃ¤?";s:7:"pl_utf8";s:27:"Czy jesteÅ› wegetarianinem?";s:7:"fr_utf8";s:18:"Es-tu vÃ©gÃ©tarien";}')).toThrow({
+        name: "Parse Error",
+        message: "Unknown key type 'ƒ' at position 111"
+      })
