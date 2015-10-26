@@ -7,6 +7,8 @@
  * http://www.opensource.org/licenses/MIT
  */
 
+var qt_phpUnserialize;
+
 (function (root, factory) {
   /*global define, exports, module */
   "use strict";
@@ -19,6 +21,8 @@
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory();
+  } else if (typeof Qt === 'object') {
+      qt_phpUnserialize = factory();
   } else {
     // Browser globals (root is window)
     root.phpUnserialize = factory();
