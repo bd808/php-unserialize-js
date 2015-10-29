@@ -21,7 +21,7 @@ var qt_phpUnserialize;
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory();
-  } else if (typeof Qt === 'object') {
+  } else if (Qt !== undefined) {
       qt_phpUnserialize = factory();
   } else {
     // Browser globals (root is window)
@@ -122,7 +122,7 @@ var qt_phpUnserialize;
               throw {
                 name: "Parse Error",
                 message: "Unknown key type '" + type + "' at position " +
-                    (idx - 2)
+                    (idx - 2) + "\n Unprocessed part:" + phpstr.substring(idx - 2)
               };
           } //end switch
         }
@@ -282,6 +282,7 @@ var qt_phpUnserialize;
             throw {
               name: "Parse Error",
               message: "Unknown type '" + type + "' at position " + (idx - 2)
+                       + "\n Unprocessed part:" + phpstr.substring(idx - 2)
             };
         } //end switch
       }; //end parseNext
