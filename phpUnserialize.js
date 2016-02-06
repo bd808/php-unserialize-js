@@ -7,6 +7,8 @@
  * http://www.opensource.org/licenses/MIT
  */
 
+var qt_phpUnserialize;
+
 (function (root, factory) {
   /*global define, exports, module */
   "use strict";
@@ -19,6 +21,8 @@
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory();
+  } else if (Qt !== undefined) {
+      qt_phpUnserialize = factory();
   } else {
     // Browser globals (root is window)
     root.phpUnserialize = factory();
@@ -37,16 +41,34 @@
       , refStack = []
       , ridx = 0
       , parseNext // forward declaraton for "use strict"
+      , parseError = function (msg) {
+          throw {
+            name: "Parse Error",
+            message: msg + " at position " +
+                (idx - 2) + "\n Unprocessed part:" + phpstr.substring(idx - 2)
+          };
+      }
+      , readEndOfValue = function () {
+          var end = phpstr.indexOf(';', idx)
+
+          if (end == -1)
+              return parseError("Cannot find end of value")
+          return end
+      }
 
       , readLength = function () {
           var del = phpstr.indexOf(':', idx)
-            , val = phpstr.substring(idx, del);
+
+          if (del == -1)
+              return parseError("Cannot read length")
+
+          var val = phpstr.substring(idx, del);
           idx = del + 2;
           return parseInt(val, 10);
         } //end readLength
 
       , readInt = function () {
-          var del = phpstr.indexOf(';', idx)
+          var del = readEndOfValue()
             , val = phpstr.substring(idx, del);
           idx = del + 1;
           return parseInt(val, 10);
@@ -59,7 +81,7 @@
         } //end parseAsInt
 
       , parseAsFloat = function () {
-          var del = phpstr.indexOf(';', idx)
+          var del = readEndOfValue()
             , val = phpstr.substring(idx, del);
           idx = del + 1;
           val = parseFloat(val);
@@ -68,7 +90,7 @@
         } //end parseAsFloat
 
       , parseAsBoolean = function () {
-          var del = phpstr.indexOf(';', idx)
+          var del = readEndOfValue()
             , val = phpstr.substring(idx, del);
           idx = del + 1;
           val = ("1" === val)? true: false;
@@ -115,11 +137,7 @@
             case 'i': return readInt();
             case 's': return readString();
             default:
-              throw {
-                name: "Parse Error",
-                message: "Unknown key type '" + type + "' at position " +
-                    (idx - 2)
-              };
+              return parseError("Unknown key type '" + type + "'")
           } //end switch
         }
 
@@ -251,10 +269,13 @@
         } //end parseAsRef
 
       , parseAsNull = function () {
+          if (phpstr.charAt(idx - 1) != ";")
+            return parseError("Null value delimiter not found")
+
           var val = null;
           refStack[ridx++] = val;
           return val;
-        }; //end parseAsNull
+        }; //end parseAsNull      
 
       parseNext = function () {
         var type = readType();
@@ -278,6 +299,7 @@
             throw {
               name: "Parse Error",
               message: "Unknown type '" + type + "' at position " + (idx - 2)
+                       + "\n Unprocessed part:" + phpstr.substring(idx - 2)
             };
         } //end switch
       }; //end parseNext
