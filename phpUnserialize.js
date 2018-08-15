@@ -32,7 +32,7 @@
    * @param {String} phpstr Php serialized string to parse
    * @return {mixed} Parsed result
    */
-  return function (phpstr) {
+  return function (phpstr,singleByte) {
     var idx = 0
       , refStack = []
       , ridx = 0
@@ -84,7 +84,7 @@
             , val;
           while (bytes < len) {
             ch = phpstr.charCodeAt(idx + utfLen++);
-            if (ch <= 0x007F) {
+            if (ch <= 0x007F || singleByte) {
               bytes++;
             } else if (ch > 0x07FF) {
               bytes += 3;
