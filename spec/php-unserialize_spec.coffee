@@ -10,6 +10,8 @@ describe 'Php-serialize Suite', ->
         .toBe('$¢€𠜎')
       expect(phpUnserialize('s:10:"$¢€𠜎";'))
         .toBe('$¢€𠜎')
+      expect(phpUnserialize('s:15:"Ztráty a nálezy";',true))
+        .toBe('Ztráty a nálezy')
 
     it "can parse an integer", ->
       expect(phpUnserialize('i:1337;')).toBe(1337)
