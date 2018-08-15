@@ -87,6 +87,13 @@ var phpUnserialize = require('phpunserialize');
 var foo = phpUnserialize('s:3:"foo";');
 ```
 
+Encoding
+--------
+PHP encodes UTF characters to string with length defined by number of bytes, not number of characters, therefore a string "$¢€𠜎" has a length of 10 instead of 4. phpUnserialize tries to mimic this behaviour. When such special characters were not encoded from UTF, but from some other 8-bit encoding (e.g. ISO-8859) the length of the string is correct and a string as "ščřž" would indeed have a length of 4. phpUnserialize would try to recreate UTF byte count and would come up with Parse error. I this case, just add true as a second parameter.PHP
+```javascript
+var foo = phpUnserialize('s:4:"ščřž";', true);
+```
+
 Running the Unit Tests
 ----------------------
 ```sh
