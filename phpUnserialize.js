@@ -139,7 +139,7 @@
           for (i = 0; i < len; i++) {
             key = readKey();
             val = parseNext();
-            if (keep === resultArray && parseInt(key, 10) === i) {
+            if (keep === resultArray && key + '' === i + '') {
               // store in array version
               resultArray.push(val);
 
