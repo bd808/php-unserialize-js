@@ -76,7 +76,7 @@
           return val;
         } //end parseAsBoolean
 
-      , readString = function () {
+      , readString = function (expect = '"') {
           var len = readLength()
             , utfLen = 0
             , bytes = 0
@@ -91,6 +91,10 @@
             } else {
               bytes += 2;
             }
+          }
+          // catch non-compliant utf8 encodings
+          if (phpstr.charAt(idx + utfLen) !== expect) {
+            utfLen += phpstr.indexOf('"', idx + utfLen) - idx - utfLen;
           }
           val = phpstr.substring(idx, idx + utfLen);
           idx += utfLen + 2;
@@ -229,7 +233,7 @@
 
       , parseAsCustom = function () {
           var clazzname = readString()
-            , content = readString();
+            , content = readString('}');
           return {
             "__PHP_Incomplete_Class_Name": clazzname,
             "serialized": content

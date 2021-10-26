@@ -14,6 +14,13 @@ describe('Php-serialize Suite', () => {
         .toBe('$¢€𠜎');
     });
 
+    it('can parse a non-UTF-8 string', () => {
+      expect(phpUnserialize('s:28:"�f���V�����b��r�[�t�n���~�q";'))
+        .toBe('�f���V�����b��r�[�t�n���~�q');
+      expect(phpUnserialize('s:30:"ãƒ™ã‚¸ã‚¿ãƒªã‚¢ãƒ³ã§ã™ã‹ï¼Ÿ";'))
+        .toBe('ãƒ™ã‚¸ã‚¿ãƒªã‚¢ãƒ³ã§ã™ã‹ï¼Ÿ');
+    });
+
     it('can parse an integer', () => {
       expect(phpUnserialize('i:1337;')).toBe(1337);
     });
