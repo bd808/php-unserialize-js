@@ -92,6 +92,10 @@
               bytes += 2;
             }
           }
+          // catch non-compliant utf8 encodings
+          if (phpstr.charAt(idx + utfLen) !== '"') {
+            utfLen += phpstr.indexOf('"', idx + utfLen) - idx - utfLen;
+          }
           val = phpstr.substring(idx, idx + utfLen);
           idx += utfLen + 2;
           return val;
