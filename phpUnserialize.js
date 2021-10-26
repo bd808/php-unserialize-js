@@ -30,9 +30,10 @@
    * Parse php serialized data into js objects.
    *
    * @param {String} phpstr Php serialized string to parse
+   * @param {Object} options Options object: floatPrecision (int) must be above 0 to work
    * @return {mixed} Parsed result
    */
-  return function (phpstr) {
+  return function (phpstr, options = {}) {
     var idx = 0
       , refStack = []
       , ridx = 0
@@ -63,6 +64,9 @@
             , val = phpstr.substring(idx, del);
           idx = del + 1;
           val = parseFloat(val);
+          if (options && options.floatPrecision) {
+            val = parseFloat(val.toFixed(options.floatPrecision));
+          }
           refStack[ridx++] = val;
           return val;
         } //end parseAsFloat
