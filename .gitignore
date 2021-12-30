@@ -1,6 +1,2 @@
-/.bundle
-/.jhw-cache
-/.rbenv-gemsets
-/.ruby-version
-/Gemfile.lock
-/vendor
+/.coverage/
+/node_modules/

@@ -1,6 +1,4 @@
-[![Build Status](https://img.shields.io/travis/bd808/php-unserialize-js.svg?style=flat)](https://travis-ci.org/bd808/php-unserialize-js)
 [![npm version](https://img.shields.io/npm/v/phpunserialize.svg?style=flat)](https://www.npmjs.com/package/phpunserialize)
-[![Bower](https://img.shields.io/bower/v/phpunserialize.svg?style=flat)]()
 
 phpUnserialize
 ==============
@@ -55,7 +53,7 @@ Serialized members of a PHP object carry scope information via name mangling.
 `phpUnserialize` strips this scope signifier prefix from private and protected
 members.
 
-Check out the [jasmine tests][] for more details or read the source.
+Check out the [tests][] for more details or read the source.
 
 
 Usage
@@ -90,8 +88,8 @@ var foo = phpUnserialize('s:3:"foo";');
 Running the Unit Tests
 ----------------------
 ```sh
-bundle install
-rake
+npm install
+npm test
 ```
 
 ---
@@ -100,7 +98,7 @@ rake
 [OMM]: http://www.oldmanmarkley.com/
 [java implementation]: https://code.google.com/p/serialized-php-parser
 [$wingin' Utter$]: http://swinginutters.com/
-[jasmine tests]: spec/php-unserialize_spec.coffee
+[tests]: php-unserialize.spec.js
 [Universal Module Definition]: https://github.com/umdjs/umd
 [AMD]: https://github.com/amdjs/amdjs-api/blob/master/AMD.md
 [CommonJS]: http://wiki.commonjs.org/wiki/CommonJS
