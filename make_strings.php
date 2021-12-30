@@ -75,3 +75,9 @@ dump($f);
 
 $f = '$¢€𠜎';
 dump($f);
+
+$array = array(
+  "0b5f7j" => "value1",
+  "anotherKey" => "value2"
+);
+dump($array);

@@ -39,6 +39,8 @@ describe('Php-serialize Suite', () => {
     it('can parse a dictionary', () => {
       expect(phpUnserialize('a:2:{s:5:"hello";i:0;s:5:"world";i:1;}')).
         toEqual({'hello':0, 'world':1});
+      expect(phpUnserialize('a:2:{s:6:"0b5f7j";s:6:"value1";s:10:"anotherKey";s:6:"value2";}')).
+        toEqual({'0b5f7j':'value1', 'anotherKey':'value2'});
     });
 
     it('can parse a reference', () => {
