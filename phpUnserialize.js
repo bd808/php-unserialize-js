@@ -11,6 +11,7 @@
   /*global define, exports, module */
   "use strict";
 
+  /* istanbul ignore next: no coverage reporting for UMD wrapper */
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define([], factory);
