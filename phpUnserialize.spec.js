@@ -191,6 +191,7 @@ describe('Php-serialize Suite', () => {
         expect(e).toHaveProperty('message', "Unknown type '' at position 0");
       }
     });
+
     it('throws exception on unknown array key type', () => {
       expect.assertions(3);
       try {
@@ -203,6 +204,7 @@ describe('Php-serialize Suite', () => {
         expect(e).toHaveProperty('state', []);
       }
     });
+
     it('throws exception on unknown object key type', () => {
       expect.assertions(3);
       try {
@@ -211,6 +213,21 @@ describe('Php-serialize Suite', () => {
         expect(e).toBeInstanceOf(Error);
         expect(e).toHaveProperty(
           'message', "Unknown key type 'd' at position 14"
+        );
+        expect(e).toHaveProperty('state', {});
+      }
+    });
+
+    it('throws exception on malformed property name', () => {
+      expect.assertions(3);
+      try {
+        phpUnserialize('O:1:"A":1:{s:6:"\u0000hello";i:0;};')
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty(
+          'message',
+          'Expected two <NUL> characters in non-public property name ' +
+          "'\u0000hello' at position 16"
         );
         expect(e).toHaveProperty('state', {});
       }

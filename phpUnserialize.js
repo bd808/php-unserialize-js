@@ -206,6 +206,11 @@
                 //
                 // So, we can to lose something in any way.
               }
+            } else {
+              var msg = 'Expected two <NUL> characters in non-public ' +
+                "property name '" + parsedName + "' at position " +
+                (idx - parsedName.length - 2);
+              throw new Error(msg);
             }
           } else {
             // public "property"
