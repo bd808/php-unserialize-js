@@ -250,6 +250,8 @@
       , parseAsCustom = function () {
           var clazzname = readString()
             , content = readString('}');
+          // There is no char after the closing quote
+          idx--;
           return {
             "__PHP_Incomplete_Class_Name": clazzname,
             "serialized": content
