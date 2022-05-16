@@ -179,6 +179,19 @@ describe('Php-serialize Suite', () => {
         phpUnserialize("C:16:\"SplObjectStorage\":76:{x:i:2;O:8:\"stdClass\":1:{s:1:\"a\";O:8:\"stdClass\":0:{}},i:1;;r:4;,i:2;;m:a:0:{}}")
       ).toEqual(expected);
     });
+
+    it('can parse a SplObjectStorage with subsequent value', () => {
+      expected = [
+        {
+          __PHP_Incomplete_Class_Name: 'SplObjectStorage',
+          serialized: 'a:1:{s:2:"id";s:10:"caO8WPx0GQ";}'
+        },
+        true
+      ];
+      expect(
+        phpUnserialize('a:2:{i:0;C:16:"SplObjectStorage":33:{a:1:{s:2:"id";s:10:"caO8WPx0GQ";}}i:1;b:1;}')
+      ).toEqual(expected);
+    });
   });
 
   describe('Invalid input', () => {
