@@ -88,6 +88,12 @@ describe('Php-serialize Suite', () => {
       )).toEqual(expected);
     });
 
+    it('can parse a numeric key', () => {
+      expect(phpUnserialize(
+        'O:3:"key":2:{i:0;N;i:1;s:4:"main";}'
+      )).toEqual({ 0: null, 1: "main" });
+    });
+
     it('can parse a complex object', () => {
       expected = {
         bar : 1,
