@@ -174,7 +174,10 @@
           var class_name
             , prop_name
             , pos;
-          if ("\u0000" === parsedName.charAt(0)) {
+          if (
+            typeof parsedName === 'string' &&
+            "\u0000" === parsedName.charAt(0)
+          ) {
             // "<NUL>*<NUL>property"
             // "<NUL>class<NUL>property"
             pos = parsedName.indexOf("\u0000", 1);
