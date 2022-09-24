@@ -54,6 +54,10 @@ describe('Php-serialize Suite', () => {
       expect(phpUnserialize('a:2:{s:5:"hello";i:42;s:5:"world";R:2;}')).
         toEqual({'hello':42, 'world':42});
     });
+
+    it('can parse an enum', () => {
+      expect(phpUnserialize('E:11:"Suit:Hearts";')).toEqual('Suit:Hearts');
+    });
   });
 
   describe('Object values', () => {

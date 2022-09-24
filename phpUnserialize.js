@@ -292,7 +292,7 @@
           case 'O': return parseAsObject();
           case 'C': return parseAsCustom();
           case 'E': return parseAsString();
-            
+
           // link to object, which is a value - affects refStack
           case 'r': return parseAsRefValue();
 
@@ -300,8 +300,7 @@
           case 'R': return parseAsRef();
 
           case 'N': return parseAsNull();
-            
-            
+
           default:
             var msg = "Unknown type '" + type + "' at position " + (idx - 2);
             throw new Error(msg);
