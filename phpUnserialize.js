@@ -77,7 +77,8 @@
           return val;
         } //end parseAsBoolean
 
-      , readString = function (expect = '"') {
+      , readString = function (expect) {
+          expect = typeof expect !== "undefined" ? expect : '"';
           var len = readLength()
             , utfLen = 0
             , bytes = 0
